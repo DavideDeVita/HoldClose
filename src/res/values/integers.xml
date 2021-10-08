@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="N_CONTENTS">5</integer>
+    <integer name="screenSignalPixel">5</integer>
+    <integer name="identifiedGameObjectCacheSize">100</integer>
+    <integer name="stuckTimeoutMillis">1500</integer>
+    <integer name="velocityThreshold">3</integer> <!--3*10^0-->
+        <integer name="vT_floatDigits">0</integer> <!--3.0F-->
+    <integer name="directionChangeThreshold">1</integer> <!--1*10^-1-->
+        <integer name="dcT_floatDigits">1</integer>
+    <integer name="GO_Properties_Pool_size">250</integer>
+    <integer name="Section_Properties_Pool_size">10</integer>
+    <integer name="Enclosement_Pool_size">5</integer>
+    <integer name="Rampage_Properties_Pool_size">25</integer>
+    <integer name="Floor_Properties_Pool_size">5</integer>
+    <integer name="ZoneFill_Properties_Pool_size">50</integer>
+    <integer name="StoryNarration_Properties_Pool_size">5</integer>
+    <integer name="Lvl_Properties_Pool_size">3</integer>
+    <integer name="RandomExtractor_Properties_Pool_size">20</integer>
+    <integer name="Spawn_Properties_Pool_size">30</integer>
+    <integer name="resizeable_Properties_Pool_size">100</integer>
+    <integer name="drawable_Properties_Pool_size">250</integer>
+    <integer name="physical_Properties_Pool_size">250</integer>
+    <integer name="animation_Properties_Pool_size">50</integer>
+    <integer name="control_Properties_Pool_size">50</integer>
+    <integer name="flag_Properties_Pool_size">5</integer>
+    <integer name="kinematic_Properties_Pool_size">50</integer>
+    <integer name="health_Properties_Pool_size">250</integer>
+    <integer name="summoner_Properties_Pool_size">25</integer>
+    <integer name="decisionTree_Properties_Pool_size">4</integer>
+    <integer name="Spawn_Pool_size">15</integer>
+    <integer name="credits_Properties_Pool_size">2</integer> <!--0.1F-->
+</resources>

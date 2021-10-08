@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="allowLightSignal">true</bool>
+    <bool name="checkTouchHold">true</bool>
+    <bool name="scrollBackground">true</bool>
+    <bool name="fixKinematicPolygonChoreography">true</bool>
+    <bool name="logActive">false</bool>
+    <bool name="untangleMain">true</bool>
+    <bool name="defaultMissingFlag">false</bool>
+    <bool name="enableOnHitByElementBehaviour">true</bool>
+    <bool name="avoidAesthetic">false</bool>
+</resources>

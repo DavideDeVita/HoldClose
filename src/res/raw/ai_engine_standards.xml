@@ -1,0 +1,689 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Definition of Game Object Builders -->
+<Standards xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingDefaultResource">
+    <DecisionTree>
+        <name>FireExtinguisherAnt_Old</name>
+        <Actions>
+            ogni child è un' azione.. il tag name dice che tipo
+            <Wander>getTagName getChild
+                <Cooldown>  getTagName Switch scegli chiamata
+                    <action> Chiamata ricorsiva
+                        <ApplyRandomImpulse>
+                            <intensity>
+                                <val1>1</val1>
+                                <val2>2</val2>
+                            </intensity>
+                            <x>true</x>
+                            <y>false</y>
+                            <dirX>
+                                <val1>-1</val1>
+                                <val2>1</val2>
+                            </dirX>
+                            null dirY
+                        </ApplyRandomImpulse>
+                    </action>
+                    <millisec>1000</millisec>
+                </Cooldown>
+            </Wander>
+            <Flee>
+                <Cooldown>
+                    <action> Chiamata ricorsiva
+                        <ApplyTargetedImpulse>
+                            <intensity>
+                                <val1>1.25</val1>
+                                <val2>2.5</val2>
+                            </intensity>
+                            <x>true</x>
+                            <y>false</y>
+                            <field>
+                                <Flag type="GameObject">
+                                    <flagName>nearestFire</flagName>
+                                </Flag>
+                            </field>
+                            <towards>false</towards>
+                        </ApplyTargetedImpulse>
+                    </action>
+                    <millisec>333</millisec>
+                </Cooldown>
+            </Flee>
+            <FirstFlee>
+                <ApplyTargetedImpulse>
+                    <intensity>
+                        <val1>3</val1>
+                        <val2>10</val2>
+                    </intensity>
+                    <x>true</x>
+                    <y>false</y>
+                    <weight>true</weight>
+                    <field>
+                        <Flag type="GameObject">
+                            <flagName>nearestFire</flagName>
+                        </Flag>
+                    </field>
+                    <towards>false</towards>
+                </ApplyTargetedImpulse>
+            </FirstFlee>
+            <Fetch>
+                <Cooldown>
+                    <action>
+                        <ApplyTargetedImpulse>
+                            <intensity>
+                                <val1>0.1</val1>
+                                <val2>0.2</val2>
+                            </intensity>
+                            <x>true</x>
+                            <y>false</y>
+                            <field>
+                                <Flag type="GameObject">
+                                    <flagName>nearestWater</flagName>
+                                </Flag>
+                            </field>
+                            <towards>true</towards>
+                        </ApplyTargetedImpulse>
+                    </action>
+                    <millisec>333</millisec>
+                </Cooldown>
+            </Fetch>
+            <Attack>
+                <Cooldown>
+                    <action>
+                        <Multiple>
+                            <Shoot>
+                                <aim>
+                                    <ApplyTargetedImpulse>
+                                        <intensity>
+                                            <val1>6.66</val1>
+                                            <val2>10.10</val2>
+                                        </intensity>
+                                        <biasY>
+                                            <val1>1</val1>
+                                            <val2>2.5</val2>
+                                        </biasY>
+                                        <x>true</x>
+                                        <y>true</y>
+                                        <weight>true</weight>
+                                        <field>
+                                            <Flag type="GameObject">
+                                                <flagName>nearestFire</flagName>
+                                            </Flag>
+                                        </field>
+                                        <towards>true</towards>
+                                    </ApplyTargetedImpulse>
+                                </aim>
+                                <y>
+                                    <val1>1</val1>
+                                    <val2>1.25</val2>
+                                </y>
+                            </Shoot>
+                            <FlagSetter>
+                                <flagName>hasWater</flagName>
+                                <value type="Boolean">false</value>
+                            </FlagSetter>
+                        </Multiple>
+                    </action>
+                    <millisec>800</millisec>
+                </Cooldown>
+            </Attack>
+            <Chase>
+                <Cooldown>
+                    <action> Chiamata ricorsiva
+                        <ApplyTargetedImpulse>
+                            <intensity>
+                                <val1>0.25</val1>
+                                <val2>0.75</val2>
+                            </intensity>
+                            <x>true</x>
+                            <y>false</y>
+                            <field>
+                                <Flag type="GameObject">
+                                    <flagName>nearestFire</flagName>
+                                </Flag>
+                            </field>
+                            <towards>true</towards>
+                        </ApplyTargetedImpulse>
+                    </action>
+                    <millisec>666</millisec>
+                </Cooldown>
+            </Chase>
+            <FirstChase>
+                <ApplyTargetedImpulse>
+                    <intensity>
+                        <val1>1</val1>
+                        <val2>2</val2>
+                    </intensity>
+                    <x>true</x>
+                    <y>false</y>
+                    <field>
+                        <Flag type="GameObject">
+                            <flagName>nearestFire</flagName>
+                        </Flag>
+                    </field>
+                    <towards>true</towards>
+                </ApplyTargetedImpulse>
+            </FirstChase>
+        </Actions>
+        <root>
+            <!-- 5 < distanceFromFire < 12.5 -->
+            <IntervalNode>
+                <min>5</min>
+                <max>12.5</max>
+                <field>
+                    <DistanceFromElement>
+                        <element>Fire</element>
+                        <saveAs>distanceFromFire</saveAs>
+                        <saveArgmin>nearestFire</saveArgmin>
+                    </DistanceFromElement>
+                </field>
+
+                <onTrue>
+                    <!-- hasWater? -->
+                    <BoolFieldNode>
+                        <field>
+                            <Flag type="boolean">
+                                <flagName>hasWater</flagName>
+                            </Flag>
+                        </field>
+
+                        <onTrue>
+                            <!-- Health < 150 -->
+                            <IntervalNode>
+                                <max>150</max>
+                                <field>
+                                    <Health></Health>
+                                </field>
+
+                                <onTrue>
+                                    <!-- Flee -->
+                                    <FirstCallLeaf>
+                                        <Log>Warn</Log>
+                                        <Standard>
+                                            <Flee></Flee>
+                                        </Standard>
+                                        <FirstTime>
+                                            <FirstFlee></FirstFlee>
+                                        </FirstTime>
+                                    </FirstCallLeaf>
+                                </onTrue>
+                                <onFalse>
+                                    <!-- 5 < distanceFromFire < 7.5 -->
+                                    <IntervalNode>
+                                        <min>5</min>
+                                        <max>7.5</max>
+                                        <field>
+                                            <Flag type="Float">
+                                                <flagName>distanceFromFire</flagName>
+                                            </Flag>
+                                        </field>
+
+                                        <onTrue>
+                                            <!-- Attack -->
+                                            <Leaf>
+                                                <Log>Error</Log>
+                                                <action>
+                                                    <Attack></Attack>
+                                                </action>
+                                            </Leaf>
+                                        </onTrue>
+                                        <onFalse>
+                                            <!-- Chase -->
+                                            <FirstCallLeaf>
+                                                <Log>Warn</Log>
+                                                <Standard>
+                                                    <Chase></Chase>
+                                                </Standard>
+                                                <FirstTime>
+                                                    <FirstChase></FirstChase>
+                                                </FirstTime>
+                                            </FirstCallLeaf>
+                                        </onFalse>
+                                    </IntervalNode>
+                                </onFalse>
+                            </IntervalNode>
+                        </onTrue>
+                        <onFalse>
+                            <!-- Water > 0 (there is water?)-->
+                            <IntervalNode>
+                                <min>0</min>
+                                <field>
+                                    <DistanceFromElement>
+                                        <element>Water</element>
+                                        <saveAs>distanceFromWater</saveAs>
+                                        <saveArgmin>nearestWater</saveArgmin>
+                                    </DistanceFromElement>
+                                </field>
+
+                                <onTrue>
+                                    <Leaf>
+                                        <action>
+                                            <Fetch></Fetch>
+                                        </action>
+                                    </Leaf>
+                                </onTrue>
+                                <onFalse>
+                                    <!-- Flee -->
+                                    <FirstCallLeaf>
+                                        <Log>Warn</Log>
+                                        <Standard>
+                                            <Flee></Flee>
+                                        </Standard>
+                                        <FirstTime>
+                                            <FirstFlee></FirstFlee>
+                                        </FirstTime>
+                                    </FirstCallLeaf>
+                                </onFalse>
+                            </IntervalNode>
+                        </onFalse>
+                    </BoolFieldNode>
+                </onTrue>
+                <onFalse>
+                    <!-- Fire >12.5 -->
+                    <IntervalNode>
+                        <min>12.5</min>
+                        max is null
+                        <field>
+                            <Flag type="Float">
+                                <flagName>distanceFromFire</flagName>
+                            </Flag>
+                        </field>
+
+                        <onTrue>
+                            <!-- Wander -->
+                            <Leaf>
+                                <action>
+                                    <Wander></Wander>
+                                </action>
+                            </Leaf>
+                        </onTrue>
+                        <onFalse>
+                            <!-- Fire > 0 (Is fire in the game?) -->
+                            <IntervalNode>
+                                <min>0</min>
+                                <field>
+                                    <Flag type="Float">
+                                        <flagName>distanceFromFire</flagName>
+                                    </Flag>
+                                </field>
+
+                                <onTrue>
+                                    <!-- Flee -->
+                                    <FirstCallLeaf>
+                                        <Log>Warn</Log>
+                                        <Standard>
+                                            <Flee></Flee>
+                                        </Standard>
+                                        <FirstTime>
+                                            <FirstFlee></FirstFlee>
+                                        </FirstTime>
+                                    </FirstCallLeaf>
+                                </onTrue>
+                                <onFalse>
+                                    <!-- Wander -->
+                                    <Leaf>
+                                        <action>
+                                            <Wander></Wander>
+                                        </action>
+                                    </Leaf>
+                                </onFalse>
+                            </IntervalNode>
+                        </onFalse>
+                    </IntervalNode>
+                </onFalse>
+            </IntervalNode>
+        </root>
+    </DecisionTree>
+
+    <DecisionTree>
+        <name>FireExtinguisherAnt</name>
+        <Actions>
+            <Wander>
+                <ApplyRandomImpulse>
+                    <intensity>
+                        <val1>1</val1>
+                        <val2>2</val2>
+                    </intensity>
+                    <x>true</x>
+                    <y>false</y>
+                    <dirX>
+                        <val1>-1</val1>
+                        <val2>1</val2>
+                    </dirX>
+                    null dirY
+                    <saveAs>lastWanderDirection</saveAs>
+                </ApplyRandomImpulse>
+            </Wander>
+            <WanderLast>
+                <ApplyDirectedImpulse>
+                    <field>
+                        <Flag type="float[]">
+                            <flagName>lastWanderDirection</flagName>
+                        </Flag>
+                    </field>
+                    <intensity>
+                        <val1>0.05</val1>
+                        <val2>0.15</val2>
+                    </intensity>
+                    <x>true</x>
+                    <y>false</y>
+                    null dirY
+                </ApplyDirectedImpulse>
+            </WanderLast>
+            <Flee>
+                <ApplyTargetedImpulse>
+                    <intensity>
+                        <val1>0.1</val1>
+                        <val2>0.15</val2>
+                    </intensity>
+                    <x>true</x>
+                    <y>false</y>
+                    <field>
+                        <Flag type="GameObject">
+                            <flagName>nearestFire</flagName>
+                        </Flag>
+                    </field>
+                    <towards>false</towards>
+                </ApplyTargetedImpulse>
+            </Flee>
+            <FirstFlee>
+                <ApplyTargetedImpulse>
+                    <intensity>
+                        <val1>1</val1>
+                        <val2>3</val2>
+                    </intensity>
+                    <x>true</x>
+                    <y>false</y>
+                    <weight>true</weight>
+                    <field>
+                        <Flag type="GameObject">
+                            <flagName>nearestFire</flagName>
+                        </Flag>
+                    </field>
+                    <towards>false</towards>
+                </ApplyTargetedImpulse>
+            </FirstFlee>
+            <Fetch>
+                <ApplyTargetedImpulse>
+                    <intensity>
+                        <val1>0.05</val1>
+                        <val2>0.1</val2>
+                    </intensity>
+                    <x>true</x>
+                    <y>false</y>
+                    <field>
+                        <Flag type="GameObject">
+                            <flagName>nearestWater</flagName>
+                        </Flag>
+                    </field>
+                    <towards>true</towards>
+                </ApplyTargetedImpulse>
+            </Fetch>
+            <Attack>
+                <Multiple>
+                    <Shoot>
+                        <aim>
+                            <ApplyTargetedImpulse>
+                                <intensity>
+                                    <val1>6.66</val1>
+                                    <val2>10.10</val2>
+                                </intensity>
+                                <biasY>
+                                    <val1>1</val1>
+                                    <val2>2.5</val2>
+                                </biasY>
+                                <x>true</x>
+                                <y>true</y>
+                                <weight>true</weight>
+                                <field>
+                                    <Flag type="GameObject">
+                                        <flagName>nearestFire</flagName>
+                                    </Flag>
+                                </field>
+                                <towards>true</towards>
+                            </ApplyTargetedImpulse>
+                        </aim>
+                        <y>1</y>
+                    </Shoot>
+                    <FlagSetter>
+                        <flagName>hasWater</flagName>
+                        <value type="Boolean">false</value>
+                    </FlagSetter>
+                </Multiple>
+            </Attack>
+            <Chase>
+                <ApplyTargetedImpulse>
+                    <intensity>
+                        <val1>0.05</val1>
+                        <val2>0.1</val2>
+                    </intensity>
+                    <x>true</x>
+                    <y>false</y>
+                    <field>
+                        <Flag type="GameObject">
+                            <flagName>nearestFire</flagName>
+                        </Flag>
+                    </field>
+                    <towards>true</towards>
+                </ApplyTargetedImpulse>
+            </Chase>
+            <FirstChase>
+                <ApplyTargetedImpulse>
+                    <intensity>
+                        <val1>0.25</val1>
+                        <val2>0.5</val2>
+                    </intensity>
+                    <x>true</x>
+                    <y>false</y>
+                    <field>
+                        <Flag type="GameObject">
+                            <flagName>nearestFire</flagName>
+                        </Flag>
+                    </field>
+                    <towards>true</towards>
+                </ApplyTargetedImpulse>
+            </FirstChase>
+            <_>
+                <NoAction></NoAction>
+            </_>
+        </Actions>
+        <root>
+            <!-- 5 <= distanceFromFire <= 12.5 -->
+            <IntervalNode>
+                <min>5</min>
+                <max>12.5</max>
+                <field>
+                    <DistanceFromElement>
+                        <element>Fire</element>
+                        <saveAs>distanceFromFire</saveAs>
+                        <saveArgmin>nearestFire</saveArgmin>
+                    </DistanceFromElement>
+                </field>
+
+                <onTrue>
+                    <!-- Health < 150 -->
+                    <IntervalNode>
+                        <max>150</max>
+                        <field>
+                            <Health></Health>
+                        </field>
+
+                        <onTrue>
+                            <!-- Flee -->
+                            <FirstCallLeaf>
+                                <Log>Warn</Log>
+                                <Standard>
+                                    <Flee></Flee>
+                                </Standard>
+                                <FirstTime>
+                                    <FirstFlee></FirstFlee>
+                                </FirstTime>
+                            </FirstCallLeaf>
+                        </onTrue>
+                        <onFalse>
+                            <!-- hasWater? -->
+                            <BoolFieldNode>
+                                <field>
+                                    <Flag type="boolean">
+                                        <flagName>hasWater</flagName>
+                                    </Flag>
+                                </field>
+
+                                <onTrue>
+                                    <!-- 5 < distanceFromFire < 7.5 -->
+                                    <IntervalNode>
+                                        <min>5</min>
+                                        <max>7.5</max>
+                                        <field>
+                                            <Flag type="Float">
+                                                <flagName>distanceFromFire</flagName>
+                                            </Flag>
+                                        </field>
+
+                                        <onTrue>
+                                            <!-- Cooldown -->
+                                            <Cooldown>
+                                                <millisec>1400</millisec>
+
+                                                <onTrue>
+                                                    <!-- Attack -->
+                                                    <Leaf>
+                                                        <Log>Error</Log>
+                                                        <action>
+                                                            <Attack></Attack>
+                                                        </action>
+                                                    </Leaf>
+                                                </onTrue>
+                                                <onFalse>
+                                                    <!-- Chance (Flee / No Action) -->
+                                                    <Chance>
+                                                        <chance>
+                                                            <val1>0.33</val1>
+                                                            <val2>0.66</val2>
+                                                        </chance>
+
+                                                        <onTrue>
+                                                            <!-- Flee -->
+                                                            <FirstCallLeaf>
+                                                                <Log>Warn</Log>
+                                                                <Standard>
+                                                                    <Flee></Flee>
+                                                                </Standard>
+                                                                <FirstTime>
+                                                                    <FirstFlee></FirstFlee>
+                                                                </FirstTime>
+                                                            </FirstCallLeaf>
+                                                        </onTrue>
+                                                        <onFalse>
+                                                            <!-- No Action -->
+                                                            <Leaf>
+                                                                <action>
+                                                                    <_></_>
+                                                                </action>
+                                                            </Leaf>
+                                                        </onFalse>
+                                                    </Chance>
+                                                </onFalse>
+                                            </Cooldown>
+                                        </onTrue>
+                                        <onFalse>
+                                            <!-- Chase -->
+                                            <FirstCallLeaf>
+                                                <Log>Warn</Log>
+                                                <Standard>
+                                                    <Chase></Chase>
+                                                </Standard>
+                                                <FirstTime>
+                                                    <FirstChase></FirstChase>
+                                                </FirstTime>
+                                            </FirstCallLeaf>
+                                        </onFalse>
+                                    </IntervalNode>
+                                </onTrue>
+                                <onFalse>
+                                    <!-- Water > 0 (there is water?)-->
+                                    <IntervalNode>
+                                        <min>0</min>
+                                        <field>
+                                            <DistanceFromElement>
+                                                <element>Water</element>
+                                                <saveAs>distanceFromWater</saveAs>
+                                                <saveArgmin>nearestWater</saveArgmin>
+                                            </DistanceFromElement>
+                                        </field>
+
+                                        <onTrue>
+                                            <Leaf>
+                                                <action>
+                                                    <Fetch></Fetch>
+                                                </action>
+                                            </Leaf>
+                                        </onTrue>
+                                        <onFalse>
+                                            <!-- Flee -->
+                                            <FirstCallLeaf>
+                                                <Log>Warn</Log>
+                                                <Standard>
+                                                    <Flee></Flee>
+                                                </Standard>
+                                                <FirstTime>
+                                                    <FirstFlee></FirstFlee>
+                                                </FirstTime>
+                                            </FirstCallLeaf>
+                                        </onFalse>
+                                    </IntervalNode>
+                                </onFalse>
+                            </BoolFieldNode>
+                        </onFalse>
+                    </IntervalNode>
+                </onTrue>
+                <onFalse>
+                    <!-- 0 <= Fire <= 12.5 (5 actually) -->
+                    <IntervalNode>
+                        <min>0</min>
+                        <max>12.5</max>
+                        <field>
+                            <Flag type="Float">
+                                <flagName>distanceFromFire</flagName>
+                            </Flag>
+                        </field>
+
+                        <onTrue>
+                            <!-- Flee -->
+                            <FirstCallLeaf>
+                                <Log>Warn</Log>
+                                <Standard>
+                                    <Flee></Flee>
+                                </Standard>
+                                <FirstTime>
+                                    <FirstFlee></FirstFlee>
+                                </FirstTime>
+                            </FirstCallLeaf>
+                        </onTrue>
+                        <onFalse>
+                            <!-- Cooldown (1.5 s) -->
+                            <Cooldown>
+                                <millisec>1500</millisec>
+
+                                <onTrue>
+                                    <!-- Wander -->
+                                    <Leaf>
+                                        <action>
+                                            <Wander></Wander>
+                                        </action>
+                                    </Leaf>
+                                </onTrue>
+                                <onFalse>
+                                    <!-- WanderLast -->
+                                    <Leaf>
+                                        <action>
+                                            <WanderLast></WanderLast>
+                                        </action>
+                                    </Leaf>
+                                </onFalse>
+                            </Cooldown>
+                        </onFalse>
+                    </IntervalNode>
+                </onFalse>
+            </IntervalNode>
+        </root>
+    </DecisionTree>
+</Standards>

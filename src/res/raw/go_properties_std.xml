@@ -1,0 +1,1728 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Syntax of definitions node:
+    <_Structure> is usually the tag name of the definition
+    <_tagName> is not an actual node present
+    <tagName> is an actual node case sensitive
+    <__tagName__> is an actual name but the name is not the one here indicated (details when present)
+-->
+
+<!-- Definition of Game Object Builders -->
+<Standards xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingDefaultResource">
+    <!--This contains the structure of a generic GameObject_Properties-->
+    <_Structure>    The readGOProperty() call would start in this node
+        <name>
+            String
+            This is the first thing read!
+            If the GameObject_Properties' dataDriven Map already has a property with this name,
+                the GO_Property you are reading will start as a copy of the one in the map.
+                All the other field under this will just custom this standard property.
+            This is also used in parseStdGOProperties(..) to create such standards
+        </name>
+        <shape>
+            Enum (GO.Shape)
+            This is external 'cause it is necessary for both Physical and Drawable components
+        </shape>
+        <onHitBehaviour>Enum (GameObject.OnHitBehaviour)</onHitBehaviour>
+        <onHitByElement> __element__ should be replaced with a GameElement name
+            <__element__>
+                Action_P
+            </__element__>
+            ..
+        </onHitByElement>
+        <explicitID>Int</explicitID>
+        <physical>
+            <position> This can be overwritten in each of his component.
+                        (In GameObject.java) However, should (x, y) not be inside Physical Box the position will be random
+                        The default triple is (0, 0, 0)
+                <x>Float</x>
+                <y>Float</y>
+                <angle>Float</angle>    is in degrees.
+            </position>
+            <type>
+                Enum (GameObject ) {Static, Dynamic, Kinematic}
+            </type>
+            <dimensionX>Float</dimensionX> this will be overwritten if the GO has a Resizeable Component.
+                                            Please Gently Note: if the shape is Circle, only dimensionX will be read
+            <dimensionY>Float</dimensionY> this will be overwritten if the GO has a Resizeable Component
+            <density>Float</density>
+            <friction>Float</friction>
+            <restitution>Float</restitution>
+            <velocity>FloatValue</velocity>
+            <direction> If this node is present the whole direction field is going to be overwritten
+                <x>FloatValue</x>
+                <y>FloatValue</y>
+            </direction>
+            <angularVelocity>
+                <_type>Float</_type> in degrees
+            </angularVelocity>
+            <lockRotation>Boolean</lockRotation>
+        </physical>
+        <kinematic>
+            <pattern>Enum (KinematcPattern)</pattern>
+            Should the pattern differ during an overwrite all the fields are going to be erased.
+            <!--case BoxBounce-->
+            <area>Box</area> Should the position (x, y) not be inside this area, the position is going to become the center of the area.
+            <!--case Polygon-->
+            <clockwise>Boolean</clockwise>
+            <coreography>   String.
+                All PolygonKinematic objects sharing the same choreography name will share points and will be optimized.
+            </coreography>
+            <points> Sequence of "point" tags
+                <point>
+                    <x>Float</x>
+                    <y>Float</y>
+                </point>
+                ...
+            </points>
+            <startingPoint>Int</startingPoint>
+            <!--case Circular-->
+            <center>
+                <x>Float</x>
+                <y>Float</y>
+            </center>
+            <radius>Float</radius>
+            <angle>Float</angle> in degrees
+            <clockwise>Boolean</clockwise>
+        </kinematic>
+        <drawable>
+            <epsilon>Float, Physical measure</epsilon>
+            <motive>Enum (Drawable.Motive)</motive>
+            <!--case Monochrome-->
+            <color type="..."> color tag has an attribute "type":
+                                should it be "String" it will expect a name of the standard Colors  (as can be read in colors.java)
+                                should it be "rgb" it will expect as follows:
+                <!-- If rgb -->
+                <a>Int</a>
+                <r>Int</r>
+                <g>Int</g>
+                <b>Int</b>
+            </color>
+            <variance>Int, can be null</variance>
+            <!--case Bitmap-->
+            <image>Enum (ResDrawable)</image>
+            ..
+            <bias_xMin>Int</bias_xMin>
+            <bias_xMax>Int</bias_xMax>
+            <bias_yMin>Int</bias_yMin>
+            <bias_yMax>Int</bias_yMax>
+            <!--case Animated-->
+            Nothing.. see animation
+        </drawable>
+        <animation>
+            <spritesheet>Enum (Spritesheets)</spritesheet>
+            <delay>int milliseconds</delay>
+            <updateOn>Enum (UpdateCondition)</updateOn>
+            <!--case Direction-->
+            <toleranceX>Float</toleranceX>
+            <toleranceY>Float</toleranceY>
+            <N>Int</N>
+            <NW>Int</NW>
+            <W>Int</W>
+            <SW>Int</SW>
+            <S>Int</S>
+            <SE>Int</SE>
+            <E>Int</E>
+            <NE>Int</NE>
+            <Idle_Dx>Int</Idle_Dx>
+            <Idle_Sx>Int</Idle_Sx>
+        </animation>
+        <resizeable>
+            <minDimX>Float</minDimX>
+            <minDimY>Float</minDimY>
+            <maxDimX>Float</maxDimX>
+            <maxDimY>Float</maxDimY>
+        </resizeable>
+        <health>
+            <healPriority>Int
+                negative values will lead to a random priority between 0 and 5
+            </healPriority>
+            <maxHealth>Float</maxHealth>
+            <startHealth>FloatValue
+                            null value will cause maxHealth.
+                            P.S.: this value will be ignored in
+                                "MainObj" in al section reading other than the first.
+            </startHealth>
+            <proportionalHealthDmg>FloatValue</proportionalHealthDmg>
+            <constDmg>FloatValue</constDmg>
+            <damageable>Boolean</damageable>
+            <element>Enum (GameElement)</element>
+            <onDie>Enum (OnDieBehaviour)</onDie>
+        </health>
+        <control>
+            <cooldown>Int</cooldown> Milliseconds
+            <holdTimer>Int</holdTimer> Milliseconds
+            <penalty>FloatValue</penalty>
+        </control>
+        <flags> a set of tags, each with the name of the given flag.
+            <flagName>Value</flagName>
+            ...
+        </flags>
+        <ai> String
+            The name of a standard ai is expected.
+        </ai>
+    </_Structure>
+
+    <_Box> This is the structure of the type Box as expected by readBox()
+        <xMin>Float</xMin>
+        <yMin>Float</yMin>
+        <xMax>Float</xMax>
+        <yMax>Float</yMax>
+    </_Box>
+    <_FloatValue> This is the structure of a FloatValue as expected by readFloatValue()
+        <val1>Float</val1>
+        <val2>Float</val2>
+
+        Should (val1) tag not be present this call will expect just a Float with no Tag
+    </_FloatValue>
+    <_Value type="...">    a (value) node as expected by readValue()
+                        "type" can be on of the following
+                    {bool, boolean, string, int, integer, float}
+            value will be read as specified by the its type
+    </_Value>
+
+    <!--Ground-->
+    <GameObj_Property>
+        <name>Ground Grass</name>
+        <shape>Block</shape>
+        <physical>
+            <type>Static</type>
+            <dimensionX>2.4</dimensionX>
+            <dimensionY>1</dimensionY>
+            <friction>0.66</friction>
+            <restitution>0.1</restitution>
+        </physical>
+        <drawable>
+            <motive>Bitmap</motive>
+            <image>GroundGrass1</image>
+            <image>GroundGrass1_mirrored</image>
+            <image>GroundGrass2</image>
+            <image>GroundGrass2_mirrored</image>
+            <image>GroundGrass3</image>
+            <image>GroundGrass3_mirrored</image>
+            <image>GroundGrass4</image>
+            <image>GroundGrass4_mirrored</image>
+        </drawable>
+        <health>
+            <element>WetGreen</element>
+            <maxHealth>60</maxHealth>
+            <startHealth>60</startHealth>
+            <proportionalHealthDmg>0</proportionalHealthDmg>
+            <constDmg>3</constDmg>
+            <damageable>false</damageable>
+        </health>
+    </GameObj_Property>
+    <GameObj_Property>
+        <name>Ground Burnt</name>
+        <shape>Block</shape>
+        <physical>
+            <type>Static</type>
+            <dimensionX>2.4</dimensionX>
+            <dimensionY>1</dimensionY>
+            <friction>0.66</friction>
+            <restitution>0.1</restitution>
+        </physical>
+        <drawable>
+            <motive>Bitmap</motive>
+            <image>GroundBurnt1</image>
+            <image>GroundBurnt1_mirrored</image>
+            <image>GroundBurnt2</image>
+            <image>GroundBurnt2_mirrored</image>
+            <image>GroundBurnt3</image>
+            <image>GroundBurnt3_mirrored</image>
+            <image>GroundBurnt4</image>
+            <image>GroundBurnt4_mirrored</image>
+        </drawable>
+        <health>
+            <element>BurningGreen</element>
+            <maxHealth>60</maxHealth>
+            <startHealth>60</startHealth>
+            <proportionalHealthDmg>0.05</proportionalHealthDmg>
+            <constDmg>3</constDmg>
+            <damageable>false</damageable>
+        </health>
+    </GameObj_Property>
+    <GameObj_Property>
+        <name>Ground End</name>
+        <shape>Block</shape>
+        <onHitBehaviour>Endgame</onHitBehaviour>
+        <physical>
+            <type>Static</type>
+            <dimensionX>2.4</dimensionX>
+            <dimensionY>1</dimensionY>
+            <friction>0.33</friction>
+            <restitution>0.1</restitution>
+        </physical>
+        <drawable>
+            <motive>Monochrome</motive>
+            <color type="String">White</color>
+            <variance>5</variance>
+            <epsilon>5</epsilon>
+        </drawable>
+        <health>
+            <element>Stone</element>
+            <maxHealth>60</maxHealth>
+            <startHealth>60</startHealth>
+            <proportionalHealthDmg>0</proportionalHealthDmg>
+            <constDmg>3</constDmg>
+            <damageable>false</damageable>
+        </health>
+    </GameObj_Property>
+
+    <!--Rampage-->
+    <GameObj_Property>
+        <name>Stone Rampage</name>
+        <shape>Block</shape>
+        <physical>
+            <type>Static</type>
+            <dimensionX>28</dimensionX>
+            <dimensionY>0.5</dimensionY>
+            <friction>0.1</friction>
+            <restitution>0.1</restitution>
+        </physical>
+        <drawable>
+            <motive>Bitmap</motive>
+            <image>Stone1</image>
+            <image>Stone2</image>
+            <image>Stone3</image>
+            <image>Stone4</image>
+            <image>Stone5</image>
+            <image>Stone6</image>
+            <image>Stone7</image>
+            <image>Stone8</image>
+            <image>Stone9</image>
+            <epsilon>10</epsilon>
+        </drawable>
+        <health>
+            <element>Stone</element>
+            <maxHealth>60</maxHealth>
+            <startHealth>60</startHealth>
+            <proportionalHealthDmg>0</proportionalHealthDmg>
+            <constDmg>5</constDmg>
+            <damageable>false</damageable>
+        </health>
+    </GameObj_Property>
+    <GameObj_Property>
+        <name>Stone Rampage Dmg Free</name>
+        <shape>Block</shape>
+        <physical>
+            <type>Static</type>
+            <dimensionX>28</dimensionX>
+            <dimensionY>0.5</dimensionY>
+            <friction>0.1</friction>
+            <restitution>0.1</restitution>
+        </physical>
+        <drawable>
+            <motive>Bitmap</motive>
+            <image>Stone1</image>
+            <image>Stone2</image>
+            <image>Stone3</image>
+            <image>Stone4</image>
+            <image>Stone5</image>
+            <image>Stone6</image>
+            <image>Stone7</image>
+            <image>Stone8</image>
+            <image>Stone9</image>
+            <epsilon>12</epsilon>
+        </drawable>
+    </GameObj_Property>
+    <GameObj_Property>
+        <name>Grass Rampage</name>
+        <shape>Block</shape>
+        <physical>
+            <type>Static</type>
+            <dimensionX>28</dimensionX>
+            <dimensionY>0.2</dimensionY>
+            <friction>0.1</friction>
+        </physical>
+        <drawable>
+            <motive>Monochrome</motive>
+            <color type='String'>Grass</color>
+            <variance>16</variance>
+            <epsilon>10</epsilon>
+        </drawable>
+        <health>
+            <element>Green</element>
+            <maxHealth>60</maxHealth>
+            <startHealth>60</startHealth>
+            <proportionalHealthDmg>0</proportionalHealthDmg>
+            <constDmg>5</constDmg>
+            <damageable>false</damageable>
+        </health>
+    </GameObj_Property>
+
+    <!--Stone-->
+    <GameObj_Property>
+        <name>Stone</name>
+        <shape>Block</shape>
+        <physical>
+            <type>Static</type>
+        </physical>
+        <drawable>
+            <motive>Bitmap</motive>
+            <image>Stone1</image>
+            <image>Stone2</image>
+            <image>Stone3</image>
+            <image>Stone4</image>
+            <image>Stone5</image>
+            <image>Stone6</image>
+            <image>Stone7</image>
+            <image>Stone8</image>
+            <image>Stone9</image>
+            <epsilon>10</epsilon>
+        </drawable>
+        <health>
+            <element>Stone</element>
+            <maxHealth>1500</maxHealth>
+            <proportionalHealthDmg>0</proportionalHealthDmg>
+            <constDmg>10</constDmg>
+            <damageable>true</damageable>
+        </health>
+    </GameObj_Property>
+
+    <!-- WOOD-->
+        <!--Wood-->
+        <GameObj_Property>
+            <name>Wood</name>
+            <shape>Block</shape>
+            <physical>
+                <type>Static</type>
+                <dimensionX>0.9</dimensionX>
+                <dimensionY>1.3</dimensionY>
+            </physical>
+            <drawable>
+                <motive>Bitmap</motive>
+                <image>Log</image>
+                <image>Log_Mirror</image>
+                <bias_yMax>0.1</bias_yMax>
+            </drawable>
+            <health>
+                <element>Wood</element>
+                <maxHealth>500</maxHealth>
+                <proportionalHealthDmg>0.1</proportionalHealthDmg>
+                <constDmg>5</constDmg>
+                <damageable>true</damageable>
+            </health>
+            <resizeable>
+                <minDimX>0.25</minDimX>
+                <minDimY>0.75</minDimY>
+                <maxDimX>1</maxDimX>
+                <maxDimY>1.5</maxDimY>
+            </resizeable>
+        </GameObj_Property>
+        <!--WetWood-->
+        <GameObj_Property>
+            <name>Wet Wood</name>
+            <shape>Block</shape>
+            <physical>
+                <type>Static</type>
+                <dimensionX>1</dimensionX>
+                <dimensionY>1.5</dimensionY>
+            </physical>
+            <drawable>
+                <motive>Bitmap</motive>
+                <image>Log</image>
+                <image>Log_Mirror</image>
+                <bias_yMax>0.1</bias_yMax>
+            </drawable>
+            <health>
+                <element>WetWood</element>
+                <maxHealth>500</maxHealth>
+                <proportionalHealthDmg>0.125</proportionalHealthDmg>
+                <constDmg>5</constDmg>
+                <damageable>true</damageable>
+            </health>
+            <resizeable>
+                <minDimX>0.5</minDimX>
+                <minDimY>0.75</minDimY>
+                <maxDimX>1</maxDimX>
+                <maxDimY>1.5</maxDimY>
+            </resizeable>
+        </GameObj_Property>
+        <!--BurningWood-->
+        <GameObj_Property>
+            <name>Burning Wood</name>
+            <shape>Block</shape>
+            <physical>
+                <type>Static</type>
+                <dimensionX>1</dimensionX>
+                <dimensionY>1.5</dimensionY>
+            </physical>
+            <drawable>
+                <motive>Bitmap</motive>
+                <image>BurningLog</image>
+                <image>BurningLog_Mirror</image>
+                <image>BurningLogStack</image>
+                <image>BurningLogStack_Mirror</image>
+                <image>BurningLogSmoke</image>
+                <bias_yMax>0.15</bias_yMax>
+            </drawable>
+            <health>
+                <element>BurningWood</element>
+                <maxHealth>450</maxHealth>
+                <proportionalHealthDmg>0.075</proportionalHealthDmg>
+                <constDmg>25</constDmg>
+                <damageable>true</damageable>
+            </health>
+            <resizeable>
+                <minDimX>0.5</minDimX>
+                <minDimY>0.75</minDimY>
+                <maxDimX>1</maxDimX>
+                <maxDimY>1.5</maxDimY>
+            </resizeable>
+        </GameObj_Property>
+
+    <!--LEAF / LEAVES-->
+        <!--Leaves-->
+        <GameObj_Property>
+            <name>Leaf SW</name>
+            <shape>Circle</shape>
+            <physical>
+                <type>Static</type>
+                <dimensionX>1.3</dimensionX>
+                <dimensionY>1.3</dimensionY>
+                <restitution>0.1</restitution>
+            </physical>
+            <drawable>
+                <motive>Bitmap</motive>
+                <image>Leaf_SW</image>
+                <image>Leaves_SW</image>
+            </drawable>
+            <health>
+                <element>Green</element>
+                <maxHealth>275</maxHealth>
+                <proportionalHealthDmg>0.05</proportionalHealthDmg>
+                <constDmg>10</constDmg>
+                <damageable>true</damageable>
+            </health>
+            <resizeable>
+                <minDimX>0.25</minDimX>
+                <minDimY>0.25</minDimY>
+                <maxDimX>1</maxDimX>
+                <maxDimY>1</maxDimY>
+            </resizeable>
+        </GameObj_Property>
+        <GameObj_Property>
+            <name>Leaf SE</name>
+            <shape>Circle</shape>
+            <physical>
+                <type>Static</type>
+                <dimensionX>1.3</dimensionX>
+                <dimensionY>1.3</dimensionY>
+                <restitution>0.1</restitution>
+            </physical>
+            <drawable>
+                <motive>Bitmap</motive>
+                <image>Leaf_SE</image>
+                <image>Leaves_SE</image>
+            </drawable>
+            <health>
+                <element>Green</element>
+                <maxHealth>275</maxHealth>
+                <proportionalHealthDmg>0.05</proportionalHealthDmg>
+                <constDmg>10</constDmg>
+                <damageable>true</damageable>
+            </health>
+            <resizeable>
+                <minDimX>0.25</minDimX>
+                <minDimY>0.25</minDimY>
+                <maxDimX>1</maxDimX>
+                <maxDimY>1</maxDimY>
+            </resizeable>
+        </GameObj_Property>
+        <!--Wet Leaves-->
+        <GameObj_Property>
+            <name>Wet Leaf SW</name>
+            <shape>Circle</shape>
+            <physical>
+                <type>Static</type>
+                <dimensionX>1.3</dimensionX>
+                <dimensionY>1.3</dimensionY>
+                <restitution>0.025</restitution>
+            </physical>
+            <drawable>
+                <motive>Bitmap</motive>
+                <image>WetLeaf_SW</image>
+                <image>WetLeaves_SW</image>
+            </drawable>
+            <health>
+                <element>WetGreen</element>
+                <maxHealth>300</maxHealth>
+                <proportionalHealthDmg>0.05</proportionalHealthDmg>
+                <constDmg>10</constDmg>
+                <damageable>true</damageable>
+            </health>
+            <resizeable>
+                <minDimX>0.33</minDimX>
+                <minDimY>0.33</minDimY>
+                <maxDimX>1.25</maxDimX>
+                <maxDimY>1.25</maxDimY>
+            </resizeable>
+        </GameObj_Property>
+        <GameObj_Property>
+            <name>Wet Leaf SE</name>
+            <shape>Circle</shape>
+            <physical>
+                <type>Static</type>
+                <dimensionX>1.3</dimensionX>
+                <dimensionY>1.3</dimensionY>
+                <restitution>0.025</restitution>
+            </physical>
+            <drawable>
+                <motive>Bitmap</motive>
+                <image>WetLeaf_SE</image>
+                <image>WetLeaves_SE</image>
+            </drawable>
+            <health>
+                <element>WetGreen</element>
+                <maxHealth>300</maxHealth>
+                <proportionalHealthDmg>0.05</proportionalHealthDmg>
+                <constDmg>10</constDmg>
+                <damageable>true</damageable>
+            </health>
+            <resizeable>
+                <minDimX>0.33</minDimX>
+                <minDimY>0.33</minDimY>
+                <maxDimX>1.25</maxDimX>
+                <maxDimY>1.25</maxDimY>
+            </resizeable>
+        </GameObj_Property>
+        <!--Burning Leaves-->
+        <GameObj_Property>
+            <name>Burning Leaf SW</name>
+            <shape>Circle</shape>
+            <physical>
+                <type>Static</type>
+                <dimensionX>1.3</dimensionX>
+                <dimensionY>1.3</dimensionY>
+                <restitution>0.125</restitution>
+            </physical>
+            <drawable>
+                <motive>Bitmap</motive>
+                <image>YellowLeaf_SW</image>
+                <image>OrangeLeaf_SW</image>
+            </drawable>
+            <health>
+                <element>BurningGreen</element>
+                <maxHealth>250</maxHealth>
+                <proportionalHealthDmg>0.05</proportionalHealthDmg>
+                <constDmg>10</constDmg>
+                <damageable>true</damageable>
+            </health>
+            <resizeable>
+                <minDimX>0.15</minDimX>
+                <minDimY>0.15</minDimY>
+                <maxDimX>1</maxDimX>
+                <maxDimY>1</maxDimY>
+            </resizeable>
+        </GameObj_Property>
+        <GameObj_Property>
+            <name>Burning Leaf SE</name>
+            <shape>Circle</shape>
+            <physical>
+                <type>Static</type>
+                <dimensionX>1.3</dimensionX>
+                <dimensionY>1.3</dimensionY>
+                <restitution>0.125</restitution>
+            </physical>
+            <drawable>
+                <motive>Bitmap</motive>
+                <image>YellowLeaf_SE</image>
+                <image>OrangeLeaf_SE</image>
+            </drawable>
+            <health>
+                <element>BurningGreen</element>
+                <maxHealth>250</maxHealth>
+                <proportionalHealthDmg>0.05</proportionalHealthDmg>
+                <constDmg>10</constDmg>
+                <damageable>true</damageable>
+            </health>
+            <resizeable>
+                <minDimX>0.15</minDimX>
+                <minDimY>0.15</minDimY>
+                <maxDimX>1</maxDimX>
+                <maxDimY>1</maxDimY>
+            </resizeable>
+        </GameObj_Property>
+
+
+    <!--spirit-->
+    <GameObj_Property>
+        <name>Spirit</name>
+        <shape>Circle</shape>
+        <physical>
+            <dimensionX>1.33</dimensionX>
+            <dimensionY>1.33</dimensionY>
+            <restitution>0.1</restitution>
+            <density>0.25</density>
+            <type>Dynamic</type>
+            <lockRotation>true</lockRotation>
+        </physical>
+        <drawable>
+            <motive>Monochrome</motive>
+        </drawable>
+        <resizeable>
+            <minDimX>0.2</minDimX>
+            <minDimY>0.2</minDimY>
+            <maxDimX>2</maxDimX>
+            <maxDimY>2</maxDimY>
+        </resizeable>
+        <health>
+            <healPriority>0</healPriority>
+            <maxHealth>800</maxHealth>
+            <!--startHealth>600</startHealth-->
+            <proportionalHealthDmg>0.125</proportionalHealthDmg>
+            <constDmg>30</constDmg>
+            <damageable>true</damageable>
+        </health>
+        <control>
+            <cooldown>1404</cooldown>
+            <holdTimer>2000</holdTimer>
+            <penalty>1.83</penalty>
+        </control>
+    </GameObj_Property>
+    <GameObj_Property>
+        <name>Fire Spirit</name>
+        <shape>Circle</shape>
+        <physical>
+            <dimensionX>1.33</dimensionX>
+            <dimensionY>1.33</dimensionY>
+            <density>0.25</density>
+            <friction>0.6</friction>
+            <type>Dynamic</type>
+            <_lockRotation>true</_lockRotation>
+        </physical>
+        <drawable>
+            <motive>Animated</motive>
+            <lockSpriteAngle>true</lockSpriteAngle>
+        </drawable>
+        <animation>
+            <delay>150</delay>
+            <updateOn>Direction</updateOn>
+            <sheetType>Single</sheetType>
+            <!-->Single-->
+            <spritesheet>Fuocherello</spritesheet>
+            <!--Direction-->
+            <toleranceX>0.25</toleranceX>
+            <toleranceY>1</toleranceY>
+            <N>-1</N>
+            <NW>6</NW>
+            <W>5</W>
+            <SW>7</SW>
+            <S>-1</S>
+            <SE>3</SE>
+            <E>1</E>
+            <NE>2</NE>
+            <Idle_Dx>0</Idle_Dx>
+            <Idle_Sx>4</Idle_Sx>
+        </animation>
+        <resizeable>
+            <minDimX>0.2</minDimX>
+            <minDimY>0.2</minDimY>
+            <maxDimX>2.5</maxDimX>
+            <maxDimY>2.5</maxDimY>
+        </resizeable>
+        <health>
+            <element>Fire</element>
+            <healPriority>0</healPriority>
+            <maxHealth>1000</maxHealth>
+            <!--startHealth>600</startHealth-->
+            <proportionalHealthDmg>0.200</proportionalHealthDmg>
+            <constDmg>30</constDmg>
+            <damageable>true</damageable>
+        </health>
+        <control>
+            <cooldown>1404</cooldown>
+            <holdTimer>2000</holdTimer>
+            <penalty>1.83</penalty>
+        </control>
+    </GameObj_Property>
+    <GameObj_Property>
+        <name>Water Spirit</name>
+        <shape>Circle</shape>
+        <physical>
+            <dimensionX>1.33</dimensionX>
+            <dimensionY>1.33</dimensionY>
+            <density>0.25</density>
+            <friction>0.6</friction>
+            <type>Dynamic</type>
+            <lockRotation>true</lockRotation>
+        </physical>
+        <drawable>
+            <motive>Animated</motive>
+            <lockSpriteAngle>true</lockSpriteAngle>
+        </drawable>
+        <animation>
+            <delay>150</delay>
+            <updateOn>Direction</updateOn>
+            <sheetType>Single</sheetType>
+            <!-->Single-->
+            <spritesheet>WatHer</spritesheet>
+            <!--Direction-->
+            <toleranceX>0.25</toleranceX>
+            <toleranceY>1</toleranceY>
+            <N>-1</N>
+            <NW>6</NW>
+            <W>5</W>
+            <SW>7</SW>
+            <S>-1</S>
+            <SE>3</SE>
+            <E>1</E>
+            <NE>2</NE>
+            <Idle_Dx>0</Idle_Dx>
+            <Idle_Sx>4</Idle_Sx>
+        </animation>
+        <resizeable>
+            <minDimX>0.25</minDimX>
+            <maxDimX>2</maxDimX>
+            <minDimY>0.25</minDimY>
+            <maxDimY>2</maxDimY>
+        </resizeable>
+        <health>
+            <element>Water</element>
+            <healPriority>0</healPriority>
+            <maxHealth>1000</maxHealth>
+            <proportionalHealthDmg>0.125</proportionalHealthDmg>
+            <constDmg>30</constDmg>
+            <damageable>true</damageable>
+        </health>
+        <control>
+            <cooldown>1404</cooldown>
+            <holdTimer>2000</holdTimer>
+            <penalty>1.83</penalty>
+        </control>
+    </GameObj_Property>
+
+    <!--Fire ball-->
+    <GameObj_Property>
+        <name>Fire Ball</name>
+        <shape>Circle</shape>
+        <physical>
+            <dimensionX>1.2</dimensionX>
+            <dimensionY>1.2</dimensionY>
+            <type>Dynamic</type>
+            <_lockRotation>true</_lockRotation>
+        </physical>
+        <drawable>
+            <motive>Animated</motive>
+            <lockSpriteAngle>true</lockSpriteAngle>
+        </drawable>
+        <animation>
+            <delay>125</delay>
+            <sheetType>Single</sheetType>
+            <updateOn>Random</updateOn>
+            <!--Single-->
+            <spritesheet>Flame</spritesheet>
+            <!--Random-->
+            <lingerChance>0.5</lingerChance>
+            <nAnimations>3</nAnimations>
+        </animation>
+        <resizeable>
+            <minDimX>0.2</minDimX>
+            <minDimY>0.2</minDimY>
+            <maxDimX>1.5</maxDimX>
+            <maxDimY>1.5</maxDimY>
+        </resizeable>
+        <health>
+            <element>Fire</element>
+            <healPriority>-1</healPriority>
+            <maxHealth>200</maxHealth>
+            <proportionalHealthDmg>0.3</proportionalHealthDmg>
+            <constDmg>60</constDmg>
+            <damageable>true</damageable>
+        </health>
+    </GameObj_Property>
+
+    <!--Water ball-->
+    <GameObj_Property>
+        <name>Water Ball</name>
+        <shape>Circle</shape>
+        <physical>
+            <dimensionX>1.2</dimensionX>
+            <dimensionY>1.2</dimensionY>
+            <restitution>0.25</restitution>
+            <type>Dynamic</type>
+        </physical>
+        <drawable>
+            <motive>Animated</motive>
+        </drawable>
+        <animation>
+            <delay>125</delay>
+            <sheetType>Single</sheetType>
+            <updateOn>Random</updateOn>
+            <!-->Single-->
+            <spritesheet>Water_Drop</spritesheet>
+            <!--Random-->
+            <lingerChance>0.5</lingerChance>
+            <nAnimations>3</nAnimations>
+        </animation>
+        <resizeable>
+            <minDimX>0.33</minDimX>
+            <minDimY>0.33</minDimY>
+            <maxDimX>1.25</maxDimX>
+            <maxDimY>1.25</maxDimY>
+        </resizeable>
+        <health>
+            <element>Water</element>
+            <healPriority>-1</healPriority>
+            <maxHealth>200</maxHealth>
+            <proportionalHealthDmg>0.25</proportionalHealthDmg>
+            <constDmg>50</constDmg>
+            <damageable>true</damageable>
+        </health>
+    </GameObj_Property>
+
+
+    <!--Rain Drop-->
+    <GameObj_Property>
+        <name>Rain Drop Small</name>
+        <shape>Circle</shape>
+        <onHitBehaviour>Erase</onHitBehaviour>
+        <physical>
+            <type>Dynamic</type>
+            <dimensionX>0.1</dimensionX>
+            <dimensionY>0.1</dimensionY>
+            <direction>
+                <x>
+                    <val1>-1</val1>
+                    <val2>-0.1</val2>
+                </x>
+                <y>
+                    <val1>-0.33</val1>
+                    <val2>0</val2>
+                </y>
+            </direction>
+            <velocity>
+                <val1>3.33</val1>
+                <val2>10</val2>
+            </velocity>
+            <density>0.1</density>
+            <restitution>0.33</restitution>
+        </physical>
+        <drawable>
+            <motive>Animated</motive>
+        </drawable>
+        <animation>
+            <delay>125</delay>
+            <sheetType>Single</sheetType>
+            <updateOn>Random</updateOn>
+            <!-->Single-->
+            <spritesheet>Water_Drop</spritesheet>
+            <!--Random-->
+            <lingerChance>0.5</lingerChance>
+            <nAnimations>3</nAnimations>
+        </animation>
+        <resizeable>
+            <minDimX>0.05</minDimX>
+            <minDimY>0.05</minDimY>
+            <maxDimX>0.2</maxDimX>
+            <maxDimY>0.2</maxDimY>
+        </resizeable>
+        <health>
+            <element>Water</element>
+            <healPriority>-1</healPriority>
+            <maxHealth>5</maxHealth>
+            <proportionalHealthDmg>0.5</proportionalHealthDmg>
+            <constDmg>2.5</constDmg>
+            <damageable>true</damageable>
+        </health>
+    </GameObj_Property>
+
+    <GameObj_Property>
+        <name>Rain Drop Medium</name>
+        <shape>Circle</shape>
+        <onHitBehaviour>Erase</onHitBehaviour>
+        <physical>
+            <type>Dynamic</type>
+            <dimensionX>0.3</dimensionX>
+            <dimensionY>0.3</dimensionY>
+            <direction>
+                <x>
+                    <val1>-1</val1>
+                    <val2>-0.1</val2>
+                </x>
+                <y>
+                    <val1>-0.33</val1>
+                    <val2>0</val2>
+                </y>
+            </direction>
+            <velocity>
+                <val1>2.5</val1>
+                <val2>7.5</val2>
+            </velocity>
+            <density>0.1</density>
+            <restitution>0.33</restitution>
+        </physical>
+        <drawable>
+            <motive>Animated</motive>
+        </drawable>
+        <animation>
+            <delay>125</delay>
+            <sheetType>Single</sheetType>
+            <updateOn>Random</updateOn>
+            <!--Single-->
+            <spritesheet>Water_Drop</spritesheet>
+            <!--Random-->
+            <lingerChance>0.5</lingerChance>
+            <nAnimations>3</nAnimations>
+        </animation>
+        <resizeable>
+            <minDimX>0.05</minDimX>
+            <minDimY>0.05</minDimY>
+            <maxDimX>0.33</maxDimX>
+            <maxDimY>0.33</maxDimY>
+        </resizeable>
+        <health>
+            <element>Water</element>
+            <healPriority>-1</healPriority>
+            <maxHealth>10</maxHealth>
+            <proportionalHealthDmg>0.5</proportionalHealthDmg>
+            <constDmg>5</constDmg>
+            <damageable>true</damageable>
+        </health>
+    </GameObj_Property>
+
+    <GameObj_Property>
+        <name>Rain Drop Big</name>
+        <shape>Circle</shape>
+        <onHitBehaviour>Erase</onHitBehaviour>
+        <physical>
+            <type>Dynamic</type>
+            <dimensionX>0.3</dimensionX>
+            <dimensionY>0.3</dimensionY>
+            <direction>
+                <x>
+                    <val1>-1</val1>
+                    <val2>-0.1</val2>
+                </x>
+                <y>
+                    <val1>-0.33</val1>
+                    <val2>0</val2>
+                </y>
+            </direction>
+            <velocity>
+                <val1>0</val1>
+                <val2>5</val2>
+            </velocity>
+            <density>0.1</density>
+            <restitution>0.33</restitution>
+        </physical>
+        <drawable>
+            <motive>Animated</motive>
+        </drawable>
+        <animation>
+            <delay>125</delay>
+            <sheetType>Single</sheetType>
+            <updateOn>Random</updateOn>
+            <!--Single-->
+            <spritesheet>Water_Drop</spritesheet>
+            <!--Random-->
+            <lingerChance>0.5</lingerChance>
+            <nAnimations>3</nAnimations>
+        </animation>
+        <resizeable>
+            <minDimX>0.05</minDimX>
+            <minDimY>0.05</minDimY>
+            <maxDimX>0.5</maxDimX>
+            <maxDimY>0.5</maxDimY>
+        </resizeable>
+        <health>
+            <element>Water</element>
+            <healPriority>-1</healPriority>
+            <maxHealth>15</maxHealth>
+            <proportionalHealthDmg>0.5</proportionalHealthDmg>
+            <constDmg>7.5</constDmg>
+            <damageable>true</damageable>
+        </health>
+    </GameObj_Property>
+
+
+    <!--Rain Drop Pond-->
+    <GameObj_Property>
+        <name>Rain Drop Pond Small</name>
+        <shape>Circle</shape>
+        <physical>
+            <type>Dynamic</type>
+            <dimensionX>0.1</dimensionX>
+            <dimensionY>0.1</dimensionY>
+            <direction>
+                <x>
+                    <val1>-1</val1>
+                    <val2>-0.1</val2>
+                </x>
+                <y>
+                    <val1>-0.33</val1>
+                    <val2>0</val2>
+                </y>
+            </direction>
+            <velocity>
+                <val1>3.33</val1>
+                <val2>10</val2>
+            </velocity>
+            <density>0.1</density>
+            <restitution>0.33</restitution>
+        </physical>
+        <drawable>
+            <motive>Animated</motive>
+        </drawable>
+        <animation>
+            <delay>125</delay>
+            <sheetType>Single</sheetType>
+            <updateOn>Random</updateOn>
+            <!--Single-->
+            <spritesheet>Water_Drop</spritesheet>
+            <!--Random-->
+            <lingerChance>0.5</lingerChance>
+            <nAnimations>3</nAnimations>
+        </animation>
+        <resizeable>
+            <minDimX>0.05</minDimX>
+            <minDimY>0.05</minDimY>
+            <maxDimX>0.2</maxDimX>
+            <maxDimY>0.2</maxDimY>
+        </resizeable>
+        <health>
+            <element>Water</element>
+            <healPriority>-1</healPriority>
+            <maxHealth>15</maxHealth>
+            <proportionalHealthDmg>0.5</proportionalHealthDmg>
+            <constDmg>2.5</constDmg>
+            <damageable>true</damageable>
+        </health>
+    </GameObj_Property>
+
+    <GameObj_Property>
+        <name>Rain Drop Pond Medium</name>
+        <shape>Circle</shape>
+        <physical>
+            <type>Dynamic</type>
+            <dimensionX>0.3</dimensionX>
+            <dimensionY>0.3</dimensionY>
+            <direction>
+                <x>
+                    <val1>-1</val1>
+                    <val2>-0.1</val2>
+                </x>
+                <y>
+                    <val1>-0.33</val1>
+                    <val2>0</val2>
+                </y>
+            </direction>
+            <velocity>
+                <val1>2.5</val1>
+                <val2>7.5</val2>
+            </velocity>
+            <density>0.1</density>
+            <restitution>0.33</restitution>
+        </physical>
+        <drawable>
+            <motive>Animated</motive>
+        </drawable>
+        <animation>
+            <delay>125</delay>
+            <sheetType>Single</sheetType>
+            <updateOn>Random</updateOn>
+            <!--Single-->
+            <spritesheet>Water_Drop</spritesheet>
+            <!--Random-->
+            <lingerChance>0.5</lingerChance>
+            <nAnimations>3</nAnimations>
+        </animation>
+        <resizeable>
+            <minDimX>0.05</minDimX>
+            <minDimY>0.05</minDimY>
+            <maxDimX>0.33</maxDimX>
+            <maxDimY>0.33</maxDimY>
+        </resizeable>
+        <health>
+            <element>Water</element>
+            <healPriority>-1</healPriority>
+            <maxHealth>30</maxHealth>
+            <proportionalHealthDmg>0.5</proportionalHealthDmg>
+            <constDmg>5</constDmg>
+            <damageable>true</damageable>
+        </health>
+    </GameObj_Property>
+
+    <GameObj_Property>
+        <name>Rain Drop Pond Big</name>
+        <shape>Circle</shape>
+        <physical>
+            <type>Dynamic</type>
+            <dimensionX>0.3</dimensionX>
+            <dimensionY>0.3</dimensionY>
+            <direction>
+                <x>
+                    <val1>-1</val1>
+                    <val2>-0.1</val2>
+                </x>
+                <y>
+                    <val1>-0.33</val1>
+                    <val2>0</val2>
+                </y>
+            </direction>
+            <velocity>
+                <val1>0</val1>
+                <val2>5</val2>
+            </velocity>
+            <density>0.1</density>
+            <restitution>0.33</restitution>
+        </physical>
+        <drawable>
+            <motive>Animated</motive>
+        </drawable>
+        <animation>
+            <delay>125</delay>
+            <sheetType>Single</sheetType>
+            <updateOn>Random</updateOn>
+            <!--Single-->
+            <spritesheet>Water_Drop</spritesheet>
+            <!--Random-->
+            <lingerChance>0.5</lingerChance>
+            <nAnimations>3</nAnimations>
+        </animation>
+        <resizeable>
+            <minDimX>0.05</minDimX>
+            <minDimY>0.05</minDimY>
+            <maxDimX>0.5</maxDimX>
+            <maxDimY>0.5</maxDimY>
+        </resizeable>
+        <health>
+            <element>Water</element>
+            <healPriority>-1</healPriority>
+            <maxHealth>50</maxHealth>
+            <proportionalHealthDmg>0.5</proportionalHealthDmg>
+            <constDmg>7.5</constDmg>
+            <damageable>true</damageable>
+        </health>
+    </GameObj_Property>
+
+
+    <!--Summonable Water Ammo-->
+    <GameObj_Property>
+        <name>Summonable Water Ammo Small</name>
+        <shape>Circle</shape>
+        <onHitBehaviour>Erase</onHitBehaviour>
+        <physical>
+            <type>Dynamic</type>
+            <dimensionX>0.1</dimensionX>
+            <dimensionY>0.1</dimensionY>
+            <density>0.5</density>
+            <restitution>0.33</restitution>
+        </physical>
+        <drawable>
+            <motive>Animated</motive>
+        </drawable>
+        <animation>
+            <delay>125</delay>
+            <sheetType>Single</sheetType>
+            <updateOn>Random</updateOn>
+            <!--Single-->
+            <spritesheet>Water_Drop</spritesheet>
+            <!--Random-->
+            <lingerChance>0.5</lingerChance>
+            <nAnimations>3</nAnimations>
+        </animation>
+        <resizeable>
+            <minDimX>0.05</minDimX>
+            <minDimY>0.05</minDimY>
+            <maxDimX>0.2</maxDimX>
+            <maxDimY>0.2</maxDimY>
+        </resizeable>
+        <health>
+            <element>Water</element>
+            <healPriority>4</healPriority>
+            <maxHealth>33</maxHealth>
+            <proportionalHealthDmg>
+                <val1>1</val1>
+                <val2>1.33</val2>
+            </proportionalHealthDmg>
+            <constDmg>3.3</constDmg>
+            <damageable>true</damageable>
+        </health>
+    </GameObj_Property>
+
+    <GameObj_Property>
+        <name>Summonable Water Ammo Medium</name>
+        <shape>Circle</shape>
+        <onHitBehaviour>Erase</onHitBehaviour>
+        <physical>
+            <type>Dynamic</type>
+            <dimensionX>0.3</dimensionX>
+            <dimensionY>0.3</dimensionY>
+            <density>0.751</density>
+            <restitution>0.33</restitution>
+        </physical>
+        <drawable>
+            <motive>Animated</motive>
+        </drawable>
+        <animation>
+            <delay>125</delay>
+            <sheetType>Single</sheetType>
+            <updateOn>Random</updateOn>
+            <!--Single-->
+            <spritesheet>Water_Drop</spritesheet>
+            <!--Random-->
+            <lingerChance>0.5</lingerChance>
+            <nAnimations>3</nAnimations>
+        </animation>
+        <resizeable>
+            <minDimX>0.05</minDimX>
+            <minDimY>0.05</minDimY>
+            <maxDimX>0.33</maxDimX>
+            <maxDimY>0.33</maxDimY>
+        </resizeable>
+        <health>
+            <element>Water</element>
+            <healPriority>3</healPriority>
+            <maxHealth>50</maxHealth>
+            <proportionalHealthDmg>
+                <val1>1</val1>
+                <val2>1.5</val2>
+            </proportionalHealthDmg>
+            <constDmg>
+                <val1>16</val1>
+                <val2>25</val2>
+            </constDmg>
+            <damageable>true</damageable>
+        </health>
+    </GameObj_Property>
+
+    <GameObj_Property>
+        <name>Summonable Water Ammo Big</name>
+        <shape>Circle</shape>
+        <onHitBehaviour>Erase</onHitBehaviour>
+        <physical>
+            <type>Dynamic</type>
+            <dimensionX>0.3</dimensionX>
+            <dimensionY>0.3</dimensionY>
+            <density>0.75</density>
+            <restitution>0.33</restitution>
+        </physical>
+        <drawable>
+            <motive>Animated</motive>
+        </drawable>
+        <animation>
+            <delay>125</delay>
+            <sheetType>Single</sheetType>
+            <updateOn>Random</updateOn>
+            <!--Single-->
+            <spritesheet>Water_Drop</spritesheet>
+            <!--Random-->
+            <lingerChance>0.5</lingerChance>
+            <nAnimations>3</nAnimations>
+        </animation>
+        <resizeable>
+            <minDimX>0.05</minDimX>
+            <minDimY>0.05</minDimY>
+            <maxDimX>0.5</maxDimX>
+            <maxDimY>0.5</maxDimY>
+        </resizeable>
+        <health>
+            <element>Water</element>
+            <healPriority>3</healPriority>
+            <maxHealth>100</maxHealth>
+            <proportionalHealthDmg>
+                <val1>1</val1>
+                <val2>2</val2>
+            </proportionalHealthDmg>
+            <constDmg>
+                <val1>10</val1>
+                <val2>50</val2>
+            </constDmg>
+            <damageable>true</damageable>
+        </health>
+    </GameObj_Property>
+
+
+    <!--Summonable Persistent Water Ammo-->
+    <GameObj_Property>
+        <name>Summonable Persistent Water Ammo Small</name>
+        <shape>Circle</shape>
+        <physical>
+            <type>Dynamic</type>
+            <dimensionX>0.1</dimensionX>
+            <dimensionY>0.1</dimensionY>
+            <density>0.5</density>
+            <restitution>0.33</restitution>
+        </physical>
+        <drawable>
+            <motive>Animated</motive>
+        </drawable>
+        <animation>
+            <delay>125</delay>
+            <sheetType>Single</sheetType>
+            <updateOn>Random</updateOn>
+            <!--Single-->
+            <spritesheet>Water_Drop</spritesheet>
+            <!--Random-->
+            <lingerChance>0.5</lingerChance>
+            <nAnimations>3</nAnimations>
+        </animation>
+        <resizeable>
+            <minDimX>0.05</minDimX>
+            <minDimY>0.05</minDimY>
+            <maxDimX>0.2</maxDimX>
+            <maxDimY>0.2</maxDimY>
+        </resizeable>
+        <health>
+            <element>Water</element>
+            <healPriority>4</healPriority>
+            <maxHealth>25</maxHealth>
+            <proportionalHealthDmg>
+                <val1>1</val1>
+                <val2>1.25</val2>
+            </proportionalHealthDmg>
+            <constDmg>
+                <val1>2.5</val1>
+                <val2>25</val2>
+            </constDmg>
+            <damageable>true</damageable>
+        </health>
+    </GameObj_Property>
+
+    <GameObj_Property>
+        <name>Summonable Persistent Water Ammo Medium</name>
+        <shape>Circle</shape>
+        <physical>
+            <type>Dynamic</type>
+            <dimensionX>0.3</dimensionX>
+            <dimensionY>0.3</dimensionY>
+            <density>0.751</density>
+            <restitution>0.33</restitution>
+        </physical>
+        <drawable>
+            <motive>Animated</motive>
+        </drawable>
+        <animation>
+            <delay>125</delay>
+            <sheetType>Single</sheetType>
+            <updateOn>Random</updateOn>
+            <!--Single-->
+            <spritesheet>Water_Drop</spritesheet>
+            <!--Random-->
+            <lingerChance>0.5</lingerChance>
+            <nAnimations>3</nAnimations>
+        </animation>
+        <resizeable>
+            <minDimX>0.05</minDimX>
+            <minDimY>0.05</minDimY>
+            <maxDimX>0.33</maxDimX>
+            <maxDimY>0.33</maxDimY>
+        </resizeable>
+        <health>
+            <element>Water</element>
+            <healPriority>3</healPriority>
+            <maxHealth>33</maxHealth>
+            <proportionalHealthDmg>
+                <val1>1</val1>
+                <val2>1.33</val2>
+            </proportionalHealthDmg>
+            <constDmg>
+                <val1>3.33</val1>
+                <val2>33.3</val2>
+            </constDmg>
+            <damageable>true</damageable>
+        </health>
+    </GameObj_Property>
+
+    <GameObj_Property>
+        <name>Summonable Persistent Water Ammo Big</name>
+        <shape>Circle</shape>
+        <physical>
+            <type>Dynamic</type>
+            <dimensionX>0.3</dimensionX>
+            <dimensionY>0.3</dimensionY>
+            <density>0.75</density>
+            <restitution>0.33</restitution>
+        </physical>
+        <drawable>
+            <motive>Animated</motive>
+        </drawable>
+        <animation>
+            <delay>125</delay>
+            <sheetType>Single</sheetType>
+            <updateOn>Random</updateOn>
+            <!--Single-->
+            <spritesheet>Water_Drop</spritesheet>
+            <!--Random-->
+            <lingerChance>0.5</lingerChance>
+            <nAnimations>3</nAnimations>
+        </animation>
+        <resizeable>
+            <minDimX>0.05</minDimX>
+            <minDimY>0.05</minDimY>
+            <maxDimX>0.5</maxDimX>
+            <maxDimY>0.5</maxDimY>
+        </resizeable>
+        <health>
+            <element>Water</element>
+            <healPriority>3</healPriority>
+            <maxHealth>50</maxHealth>
+            <proportionalHealthDmg>
+                <val1>1</val1>
+                <val2>1.5</val2>
+            </proportionalHealthDmg>
+            <constDmg>
+                <val1>5.05</val1>
+                <val2>50.5</val2>
+            </constDmg>
+            <damageable>true</damageable>
+        </health>
+    </GameObj_Property>
+
+
+    <!--Fire Ant-->
+    <!-- REQUIRES Summonable [Persistent] Water Ammo [..] TO BE DEFINED -->
+    <GameObj_Property>
+        <name>Fire Extinguisher Ant</name>
+        <shape>Block</shape>
+        <onHitByElement>
+            <Water>
+                <FlagSetter>
+                    <flagName>hasWater</flagName>
+                    <value type="Boolean">true</value>
+                </FlagSetter>
+            </Water>
+        </onHitByElement>
+        <_explicitID>168, removed</_explicitID>
+        <physical>
+            <type>Dynamic</type>
+            <dimensionX>1.3</dimensionX>
+            <dimensionY>1</dimensionY>
+            <lockRotation>true</lockRotation>
+        </physical>
+        <drawable>
+            <motive>Animated</motive>
+        </drawable>
+        <animation>
+            <delay>150</delay>
+            <updateOn>Direction</updateOn>
+            <sheetType>Multiple</sheetType>
+            <!-->Single-->
+            <spritesheet>Ant</spritesheet>
+            <spritesheet>Ant_Armed</spritesheet>
+            <condition>
+                <name>hasWater</name>
+                <value type="Boolean">False</value>
+                <sheet>0</sheet>
+            </condition>
+            <condition>
+                <name>hasWater</name>
+                <value type="Boolean">True</value>
+                <sheet>1</sheet>
+            </condition>
+            <!--Direction-->
+            <toleranceX>0.25</toleranceX>
+            <toleranceY>1</toleranceY>
+            <N>-1</N>
+            <NW>-1</NW>
+            <W>1</W>
+            <SW>-1</SW>
+            <S>-1</S>
+            <SE>-1</SE>
+            <E>0</E>
+            <NE>-1</NE>
+            <Idle_Dx>0</Idle_Dx>
+            <Idle_Sx>1</Idle_Sx>
+        </animation>
+        <health>
+            <element>Ant</element>
+            <healPriority>-1</healPriority>
+            <maxHealth>1500</maxHealth>
+            <proportionalHealthDmg>0.01</proportionalHealthDmg>
+            <constDmg>85</constDmg>
+            <damageable>true</damageable>
+        </health>
+        <flags>
+            <flags>
+                <hasWater type="Boolean">false</hasWater>
+            </flags>
+            <toNotify>
+                <hasWater>Animation</hasWater>
+            </toNotify>
+        </flags>
+        <ai>FireExtinguisherAnt_Old</ai>
+        <summoner>
+            <exludeLast>3</exludeLast>
+            <options>
+                <WaterAmmoSmall>
+                    <name>Summonable Water Ammo Small</name>
+                </WaterAmmoSmall>
+                <WaterAmmoSmall>
+                    <name>Summonable Water Ammo Small</name>
+                </WaterAmmoSmall>
+                <WaterAmmoSmall>
+                    <name>Summonable Water Ammo Small</name>
+                </WaterAmmoSmall>
+                <WaterAmmoPersistentSmall>
+                    <name>Summonable Persistent Water Ammo Small</name>
+                </WaterAmmoPersistentSmall>
+                <WaterAmmoPersistentSmall>
+                    <name>Summonable Persistent Water Ammo Small</name>
+                </WaterAmmoPersistentSmall>
+                <WaterAmmoPersistentSmall>
+                    <name>Summonable Persistent Water Ammo Small</name>
+                </WaterAmmoPersistentSmall>
+                <WaterAmmoMedium>
+                    <name>Summonable Water Ammo Medium</name>
+                </WaterAmmoMedium>
+                <WaterAmmoMedium>
+                    <name>Summonable Water Ammo Medium</name>
+                </WaterAmmoMedium>
+                <WaterAmmoPersistentMedium>
+                    <name>Summonable Persistent Water Ammo Medium</name>
+                </WaterAmmoPersistentMedium>
+                <WaterAmmoPersistentMedium>
+                    <name>Summonable Persistent Water Ammo Medium</name>
+                </WaterAmmoPersistentMedium>
+                <WaterAmmoBig>
+                    <name>Summonable Water Ammo Big</name>
+                </WaterAmmoBig>
+                <WaterAmmoPersistentBig>
+                    <name>Summonable Persistent Water Ammo Big</name>
+                </WaterAmmoPersistentBig>
+            </options>
+        </summoner>
+    </GameObj_Property>
+    <GameObj_Property>
+        <name>Fire Angry Ant</name>
+        <shape>Block</shape>
+        <onHitByElement>
+            <Water>
+                <FlagSetter>
+                    <flagName>hasWater</flagName>
+                    <value type="Boolean">true</value>
+                </FlagSetter>
+            </Water>
+        </onHitByElement>
+        <_explicitID>168, removed</_explicitID>
+        <physical>
+            <type>Dynamic</type>
+            <dimensionX>1.3</dimensionX>
+            <dimensionY>1</dimensionY>
+            <lockRotation>true</lockRotation>
+        </physical>
+        <drawable>
+            <motive>Animated</motive>
+        </drawable>
+        <animation>
+            <delay>150</delay>
+            <updateOn>Direction</updateOn>
+            <sheetType>Multiple</sheetType>
+            <!-->Single-->
+            <spritesheet>Evil_Ant</spritesheet>
+            <spritesheet>Evil_Ant_Armed</spritesheet>
+            <condition>
+                <name>hasWater</name>
+                <value type="Boolean">False</value>
+                <sheet>0</sheet>
+            </condition>
+            <condition>
+                <name>hasWater</name>
+                <value type="Boolean">True</value>
+                <sheet>1</sheet>
+            </condition>
+            <!--Direction-->
+            <toleranceX>0.25</toleranceX>
+            <toleranceY>1</toleranceY>
+            <N>-1</N>
+            <NW>-1</NW>
+            <W>1</W>
+            <SW>-1</SW>
+            <S>-1</S>
+            <SE>-1</SE>
+            <E>0</E>
+            <NE>-1</NE>
+            <Idle_Dx>0</Idle_Dx>
+            <Idle_Sx>1</Idle_Sx>
+        </animation>
+        <health>
+            <element>Ant</element>
+            <healPriority>-1</healPriority>
+            <maxHealth>1500</maxHealth>
+            <proportionalHealthDmg>0.01</proportionalHealthDmg>
+            <constDmg>85</constDmg>
+            <damageable>true</damageable>
+        </health>
+        <flags>
+            <flags>
+                <hasWater type="Boolean">false</hasWater>
+            </flags>
+            <toNotify>
+                <hasWater>Animation</hasWater>
+            </toNotify>
+        </flags>
+        <ai>FireExtinguisherAnt_Old</ai>
+        <summoner>
+            <exludeLast>3</exludeLast>
+            <options>
+                <WaterAmmoSmall>
+                    <name>Summonable Water Ammo Small</name>
+                </WaterAmmoSmall>
+                <WaterAmmoSmall>
+                    <name>Summonable Water Ammo Small</name>
+                </WaterAmmoSmall>
+                <WaterAmmoSmall>
+                    <name>Summonable Water Ammo Small</name>
+                </WaterAmmoSmall>
+                <WaterAmmoPersistentSmall>
+                    <name>Summonable Persistent Water Ammo Small</name>
+                </WaterAmmoPersistentSmall>
+                <WaterAmmoPersistentSmall>
+                    <name>Summonable Persistent Water Ammo Small</name>
+                </WaterAmmoPersistentSmall>
+                <WaterAmmoPersistentSmall>
+                    <name>Summonable Persistent Water Ammo Small</name>
+                </WaterAmmoPersistentSmall>
+                <WaterAmmoMedium>
+                    <name>Summonable Water Ammo Medium</name>
+                </WaterAmmoMedium>
+                <WaterAmmoMedium>
+                    <name>Summonable Water Ammo Medium</name>
+                </WaterAmmoMedium>
+                <WaterAmmoPersistentMedium>
+                    <name>Summonable Persistent Water Ammo Medium</name>
+                </WaterAmmoPersistentMedium>
+                <WaterAmmoPersistentMedium>
+                    <name>Summonable Persistent Water Ammo Medium</name>
+                </WaterAmmoPersistentMedium>
+                <WaterAmmoBig>
+                    <name>Summonable Water Ammo Big</name>
+                </WaterAmmoBig>
+                <WaterAmmoPersistentBig>
+                    <name>Summonable Persistent Water Ammo Big</name>
+                </WaterAmmoPersistentBig>
+            </options>
+        </summoner>
+    </GameObj_Property>
+
+
+    <!--Circle simple-->
+    <GameObj_Property>
+        <name>Circle</name>
+        <shape>Circle</shape>
+        <physical>
+            <dimensionX>1.33</dimensionX>
+            <dimensionY>1.33</dimensionY>
+            <type>Dynamic</type>
+        </physical>
+        <drawable>
+            <motive>Monochrome</motive>
+        </drawable>
+    </GameObj_Property>
+
+    <!--Square Simple-->
+    <GameObj_Property>
+        <name>Square</name>
+        <shape>Block</shape>
+        <physical>
+            <type>Static</type>
+            <dimensionX>1</dimensionX>
+            <dimensionY>1</dimensionY>
+        </physical>
+        <drawable>
+            <motive>Monochrome</motive>
+        </drawable>
+    </GameObj_Property>
+</Standards>

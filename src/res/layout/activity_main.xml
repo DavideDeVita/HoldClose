@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/main_menu"
+    tools:context=".MainActivity">
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="wrap_content"
+        android:layout_height="91dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="108dp"
+        android:layout_marginEnd="105dp"
+        android:ems="10"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:fontFamily="cursive"
+        android:inputType="none"
+        android:selectAllOnFocus="false"
+        android:text="@string/app_name"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textColor="#DD2C00"
+        android:textIsSelectable="false"
+        android:textSize="36sp"
+        android:textStyle="bold|italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Space
+        android:id="@+id/space_123"
+        android:layout_width="match_parent"
+        android:layout_height="108dp"
+        android:layout_below="@+id/editText"
+        android:layout_marginTop="7dp" />
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="150dp"
+        android:layout_height="75dp"
+        android:layout_alignTop="@id/space_123"
+        android:layout_alignBottom="@id/space_123"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginBottom="20dp"
+        android:layout_toStartOf="@+id/button2"
+        android:background="@drawable/lvl1_button" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="150dp"
+        android:layout_height="75dp"
+        android:layout_alignTop="@id/space_123"
+        android:layout_alignBottom="@id/space_123"
+        android:layout_marginTop="19dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginBottom="21dp"
+        android:layout_toStartOf="@+id/button3"
+        android:background="@drawable/lvl2_button" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="150dp"
+        android:layout_height="67dp"
+        android:layout_alignTop="@id/space_123"
+        android:layout_alignBottom="@id/space_123"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/lvl3_button" />
+
+    <Button
+        android:id="@+id/buttonCredits"
+        android:layout_width="104dp"
+        android:layout_height="150dp"
+        android:layout_below="@+id/space_123"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="26dp"
+        android:layout_marginEnd="29dp"
+        android:layout_marginBottom="30dp"
+        android:background="@drawable/lvl4_button" />
+
+    <Button
+        android:id="@+id/buttonTutorial"
+        android:layout_width="167dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="46dp"
+        android:layout_marginBottom="11dp"
+        android:alpha="1"
+        android:background="@android:color/transparent"
+        android:fontFamily="casual"
+        android:text="Tutorial"
+        android:textColor="#E65100"
+        android:textIsSelectable="false"
+        android:textSize="24sp"
+        android:textStyle="bold|italic" />
+
+</RelativeLayout>
